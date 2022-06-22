@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  server:
+    build:
+      dockerfile: Dockerfile-dev
+      args:
+        PORT: ${PORT}
+    ports:
+      - "3004:3004"
+    command: yarn run dev
+    environment:
+      - PORT=3004
+      - CLIENT_URL=http://192.168.19.128:3003
+    # bind mount
+    volumes:
+      - ./server:/dictionary-app/server
+      - /dictionary-app/server/node_modules
+
+  mongo:
+    image: mongo:latest
+    
+  client:
+    build: 
+      dockerfile: Dockerfile-dev
+      args:
+        PORT: ${PORT}
+    environment:
+      - PORT=3003
+      - UMI_APP_API_URL=http://192.168.19.128:3004
+    ports:
+      - "3003:3003"
+    command: yarn start
+    # bind mount
+    volumes:
+      - ./client:/dictionary-app/client
+      - /dictionary-app/client/node_modules
